@@ -44,33 +44,7 @@
   }
   h1 { font-size: clamp(26px, 4.5vw, 38px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
   .sub { color: var(--ink-soft); font-size: 15px; margin-top: 8px; max-width: 620px; }
-
-  .explainer {
-    margin-top: 14px;
-    max-width: 680px;
-    background: #F7F5EA;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 4px 16px;
-  }
-  .explainer summary {
-    cursor: pointer;
-    font-size: 13.5px;
-    font-weight: 500;
-    color: var(--ink);
-    padding: 10px 0;
-    list-style: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .explainer summary::-webkit-details-marker { display: none; }
-  .explainer summary::before { content: '?'; display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: var(--yellow); font-size: 12px; font-weight: 700; flex-shrink: 0; }
-  .explainer[open] summary::before { content: '\2013'; }
-  .explainer-body { padding: 0 0 16px; font-size: 13.5px; color: var(--ink-soft); }
-  .explainer-body p { margin-bottom: 10px; }
-  .explainer-body p:last-child { margin-bottom: 0; }
-  .explainer-body b { color: var(--ink); font-weight: 600; }
+  .sub a { color: var(--ink); }
 
   .panel {
     background: var(--card);
@@ -167,7 +141,6 @@
   .cell.hit::after { transform: rotate(-45deg); }
   .cell.blocked { background: var(--line); color: #8A96A8; text-decoration: line-through; }
 
-  footer { margin-top: 32px; font-size: 12.5px; color: var(--ink-soft); max-width: 680px; }
 </style>
 </head>
 <body>
@@ -175,16 +148,7 @@
   <header>
     <span class="eyebrow">6 aus 45 &middot; Anti-Popularit&auml;t</span>
     <h1>Tippgenerator gegen das Teilen</h1>
-    <p class="sub">Erzeugt Zufallstipps, die statistisch selten von anderen gespielt werden: keine Geburtstags- und Gl&uuml;ckszahlen-Cluster, keine Muster, hohe Summe, ein Nachbarpaar. Die Gewinnchance bleibt exakt gleich &ndash; nur das Risiko, den Sechser teilen zu m&uuml;ssen, sinkt.</p>
-    <details class="explainer">
-      <summary>Was bedeuten "Popularit&auml;t" und "Topf-Anteil"?</summary>
-      <div class="explainer-body">
-        <p><b>Wichtig zuerst:</b> Nichts davon ver&auml;ndert deine Gewinn<u>wahrscheinlichkeit</u>. Die ist f&uuml;r jede der 8.145.060 m&ouml;glichen Kombinationen exakt gleich (1&nbsp;:&nbsp;8.145.060). Was sich &auml;ndert, ist nur, <b>wie viel</b> du bekommst, <i>falls</i> du gewinnst &ndash; weil der Gewinntopf jedes Rangs unter allen Gewinnern mit gleichen Zahlen aufgeteilt wird.</p>
-        <p><b>Popularit&auml;t (z.&nbsp;B. "1,8&times; Durchschnitt")</b> sch&auml;tzt, wie oft <i>andere Spieler</i> genau diese 6 Zahlen w&auml;hlen w&uuml;rden, im Vergleich zu einem reinen Zufallstipp. 1,0&times; = durchschnittlich. Zahlen bis 31 (Geburtstage), die Gl&uuml;ckszahlen 3/7/9 und erkennbare Muster (Reihen, Diagonalen) treiben den Wert hoch; ein Nachbarpaar und eine hohe Summe senken ihn. Das ist eine Sch&auml;tzung auf Basis bekannter Tippmuster, keine gemessene Verkaufszahl &ndash; die genaue Zahl ist weniger wichtig als die Richtung.</p>
-        <p><b>Erwarteter Topf-Anteil</b> ist die eigentlich relevante Gr&ouml;&szlig;e: Falls dieser Tipp den Sechser trifft, welchen Anteil am Gewinntopf bekommst du im Schnitt, nachdem er mit eventuellen Mitgewinnern geteilt wurde? Ein Zufallstipp liegt bei ~67&nbsp;%, ein stark optimierter Tipp bei ~80&ndash;85&nbsp;%, ein Geburtstags- oder Muster-Tipp kann auf 20&nbsp;% oder tiefer fallen &ndash; wie beim ber&uuml;hmten Fall in Deutschland 1999, als 2-3-4-5-6-26 gezogen wurde und rund 38.000 Spieler sich einen Fünferrang teilten.</p>
-        <p class="hint" style="margin-top:10px">Modellannahme dahinter: ~7&nbsp;Mio Tipps pro Runde, davon ~35&nbsp;% reine Quicktipps (gleichm&auml;&szlig;ig verteilt). Diese Sockelmenge sorgt daf&uuml;r, dass selbst der bestm&ouml;gliche Tipp realistisch nie &uuml;ber ~85&nbsp;% erwarteten Anteil kommt.</p>
-      </div>
-    </details>
+    <p class="sub">Zufallstipps, die andere Spieler seltener w&auml;hlen &ndash; senkt nur das Risiko, einen Gewinn teilen zu m&uuml;ssen, nicht die Gewinnchance selbst (<a href="https://github.com/Undertaker289/lotto-tipp-generator#readme" target="_blank" rel="noopener">Details &amp; Methodik</a>).</p>
   </header>
 
   <div class="panel">
@@ -194,22 +158,16 @@
         <input type="text" inputmode="numeric" id="count" value="2" style="width:70px">
       </div>
       <div class="field">
-        <label for="exclude">Zahlen ausschlie&szlig;en (z.&nbsp;B. letzte Ziehung)</label>
-        <input type="text" id="exclude" value="" placeholder="optional, z. B. letzte Ziehung" spellcheck="false">
+        <label for="exclude">Zahlen ausschlie&szlig;en</label>
+        <input type="text" id="exclude" value="" placeholder="optional" spellcheck="false">
       </div>
       <button class="go" id="go">Tipps generieren</button>
     </div>
-    <p class="hint">Feste Regeln: nichts unter 14, h&ouml;chstens 2 Zahlen im Geburtstagsbereich (&le;31), Summe &ge; 150, mindestens ein Nachbarpaar, keine arithmetischen Ketten, keine 3/7/9, keine reinen Primzahlentipps. Zwei identische Tipps werden ausgeschlossen.</p>
-    <p class="hint">Das Ausschluss-Feld ist rein optional &ndash; ob k&uuml;rzlich gezogene Zahlen wirklich etwas &ouml;fter getippt werden (Nachzieher-Effekt), ist eine Vermutung, kein belegter Faktor. Statistisch macht es keinen Unterschied.</p>
     <p class="warn" id="warn"></p>
     <p class="hint" id="info" style="display:none"></p>
   </div>
 
   <div class="tips" id="tips"></div>
-
-  <footer>
-    Modellannahme f&uuml;r den Topf-Anteil: ~7&nbsp;Mio Tipps pro Runde, ~35&nbsp;% Quicktipp-Anteil, Poisson-N&auml;herung. Der angezeigte Wert ist der erwartete Anteil am Sechser-Gewinnrang, falls der Tipp gewinnt. Kein Einfluss auf die Gewinnwahrscheinlichkeit selbst (1&nbsp;:&nbsp;8.145.060 pro Tipp).
-  </footer>
 </div>
 
 <script>
