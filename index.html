@@ -141,6 +141,25 @@
   .cell.hit::after { transform: rotate(-45deg); }
   .cell.blocked { background: var(--line); color: #8A96A8; text-decoration: line-through; }
 
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(120%);
+    background: var(--ink);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 9999;
+    transition: transform 0.3s ease;
+    max-width: 90%;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
 </style>
 </head>
 <body>
@@ -155,10 +174,10 @@
     <div class="controls">
       <div class="field">
         <label for="count">Anzahl Tipps (max. 200)</label>
-        <input type="text" inputmode="numeric" id="count" value="2" style="width:70px">
+        <input type="number" id="count" value="2" min="1" max="200" style="width:70px">
       </div>
       <div class="field">
-        <label for="seed">Seed (optional)</label>
+        <label for="seed" title="Gleiches Seed = gleiche Tipps jedes Mal. Leerfeld = automatisch generiert.">Seed (optional) <span style="color: var(--ink-soft); cursor: help;">❓</span></label>
         <input type="text" id="seed" value="" placeholder="für Reproduzierbarkeit" spellcheck="false" style="width:140px">
       </div>
       <div class="field">
@@ -180,6 +199,7 @@
   </div>
 
   <div class="tips" id="tips"></div>
+  <div class="toast" id="toast"></div>
 </div>
 
 <script>
@@ -214,8 +234,10 @@
         history = history.slice(0, MAX_HISTORY);
       }
       localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+      return true;
     } catch (e) {
       console.warn('Verlauf konnte nicht gespeichert werden:', e);
+      return false;
     }
   }
 
@@ -225,9 +247,19 @@
       history.splice(index, 1);
       localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
       showHistory();
+      showToast('✓ Eintrag gelöscht');
     } catch (e) {
-      console.warn('Eintrag konnte nicht gelöscht werden:', e);
+      showToast('⚠️ Eintrag konnte nicht gelöscht werden');
     }
+  }
+
+  function showToast(message, duration = 3000) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, duration);
   }
 
   function clearHistory() {
@@ -235,8 +267,9 @@
       try {
         localStorage.removeItem(HISTORY_KEY);
         showHistory();
+        showToast('Verlauf gelöscht');
       } catch (e) {
-        console.warn('Verlauf konnte nicht gelöscht werden:', e);
+        showToast('Fehler beim Löschen des Verlaufs');
       }
     }
   }
@@ -272,7 +305,7 @@
       const tipStr = entry.tips.map(t => `<span class="num" style="background: var(--yellow); padding: 3px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; display: inline-block; min-width: 30px; text-align: center;">${String(t).padStart(2, '0')}</span>`).join('');
       html += `
         <div style="background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
-          <div style="flex: 1; cursor: pointer; min-width: 0;" onclick="loadFromHistory(${idx})">
+          <div style="flex: 1; cursor: pointer; min-width: 0;" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();loadFromHistory(${idx})}" onclick="loadFromHistory(${idx})" title="Klicken oder Enter zum Laden">
             <div style="font-size: 12px; font-weight: 500; color: var(--ink); margin-bottom: 4px;">Seed: <code style="background: rgba(20,40,75,0.1); padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 11px;">${entry.seed}</code></div>
             <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 4px;">${tipStr}</div>
             <div style="font-size: 11px; color: var(--ink-soft);">${entry.date}</div>
@@ -367,6 +400,10 @@
   }
 
   function generate() {
+    const goButton = document.getElementById('go');
+    goButton.disabled = true;
+    goButton.textContent = '⏳ Wird generiert...';
+
     const countInput = document.getElementById('count');
     let count = parseInt(countInput.value, 10);
     if (!Number.isFinite(count) || count < 1) count = 1;
@@ -383,7 +420,17 @@
 
     initSeed(seedValue);
 
-    const excluded = parseExcluded(document.getElementById('exclude').value);
+    const excludeInput = document.getElementById('exclude').value.trim();
+    const excluded = parseExcluded(excludeInput);
+
+    if (excludeInput && excluded.size === 0) {
+      warn.textContent = '⚠️ Keine gültigen Zahlen eingegeben. Format: z.B. "5, 10, 15"';
+      warn.style.display = 'block';
+      goButton.disabled = false;
+      goButton.textContent = 'Tipps generieren';
+      return;
+    }
+
     const warn = document.getElementById('warn');
     warn.style.display = 'none';
     const info = document.getElementById('info');
@@ -405,7 +452,7 @@
         tip = drawTip(available, tips);
       }
       if (!tip) {
-        warn.textContent = 'Mit diesen Ausschlüssen ist kein gültiger Tipp mehr baubar. Weniger Zahlen ausschließen.';
+        warn.textContent = '⚠️ Zu viele Zahlen ausgeschlossen – bitte weniger Zahlen eingeben.';
         warn.style.display = 'block';
         break;
       }
@@ -414,18 +461,26 @@
     }
     if (fellBack && tips.length > 0) {
       info.textContent = disjointCount === 0
-        ? 'Bei diesem Zahlenpool war kein Tipp überschneidungsfrei möglich – alle ' + tips.length + ' Tipps überlappen sich, sind aber untereinander eindeutig.'
-        : 'Tipp 1–' + disjointCount + ' überschneidungsfrei, ab Tipp ' + (disjointCount + 1) + ' mit möglichen Überschneidungen (aber ohne doppelte Tipps).';
+        ? 'ℹ️ Mit diesem Zahlenpool war keine vollständige Trennung möglich – einige Tipps überlappen sich.'
+        : 'ℹ️ Tipp 1–' + disjointCount + ' ohne Überschneidungen, ab Tipp ' + (disjointCount + 1) + ' mit Überschneidungen.';
       info.style.display = 'block';
     }
     render(tips, excluded);
 
-    if (tips.length > 0) {
-      const popularities = tips.map(tip => popularityFactor(tip));
-      saveEntry(seedValue, tips, popularities);
-      showHistory();
+      if (tips.length > 0) {
+        const popularities = tips.map(tip => popularityFactor(tip));
+        const saved = saveEntry(seedValue, tips, popularities);
+        if (!saved) {
+          showToast('⚠️ Tipps generiert, aber nicht gespeichert (Speicher voll?)');
+        } else {
+          showToast('✓ Tipps gespeichert');
+        }
+        showHistory();
+      }
+
+      goButton.disabled = false;
+      goButton.textContent = 'Tipps generieren';
     }
-  }
 
   function render(tips, excluded) {
     const host = document.getElementById('tips');
