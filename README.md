@@ -62,7 +62,7 @@ Die Quicktipp-Menge bildet einen Sockel, den keine Zahlenwahl unterschreiten kan
 
 Eine einzelne, abhängigkeitsfreie `index.html` (Vanilla JS, kein Build-Prozess). Läuft vollständig im Browser, keine Serverkomponente, keine Datenübertragung.
 
-### Reproduzierbarkeit mit Seed
+### Reproduzierbarkeit mit Seed & Verlauf
 
 Das **Seed-Feld** ermöglicht deterministische Tipp-Generierung: Dieselbe Seed-Zahl erzeugt immer dieselben Tipps.
 
@@ -71,13 +71,21 @@ Das **Seed-Feld** ermöglicht deterministische Tipp-Generierung: Dieselbe Seed-Z
 - **Manuell:** Du kannst auch selbst eine Seed-Zahl eingeben (z.B. `12345`)
 - **Resultat:** Mehrfaches Klicken mit **gleichem Seed** = **identische Tipps**
 
-**Praktische Anwendungen:**
-- **Tipps speichern:** Der Auto-Seed wird angezeigt → speichern, um später die gleichen Tipps zu reproduzieren
-- **Mit Freunden teilen:** "Nutze Seed `9999`, dann hast du die gleichen Tipps wie ich"
-- **Reproduzieren:** Interessante Kombination? Den angezeigten Seed notieren und später erneut eingeben
-- **Vergleichen:** A/B-Tests: Beide mit Seed X bekommen identische Resultate
+**Verlauf:**
+- Jede Generierung wird automatisch mit Seed, Tipps und Datum gespeichert (bis zu 50 Einträge)
+- Der Verlauf wird in `localStorage` gespeichert und bleibt über Browser-Neuladen erhalten
+- **Eintrag anklicken** = Tipps reproduzieren
+- **Verlauf löschen** Button = Kompletten Verlauf löschen (mit Bestätigung)
 
-**Technische Implementierung:** Verwendet einen deterministischen Pseudozufallsgenerator (seeded RNG mit Math.sin-Basis), nicht kryptographisch sicher aber für Lotto-Tipps ausreichend.
+**Praktische Anwendungen:**
+- **Tipps archivieren:** Alle generierten Tipps sind im Verlauf → einfach klicken zum Reproduzieren
+- **Mit Freunden teilen:** "Nutze Seed `9999`, dann hast du die gleichen Tipps wie ich"
+- **Interessante Kombinationen:** Findest du einen guten Tipp? Eintrag klicken, um alle Infos zu sehen
+- **Vergleichen:** Alte Tipps jederzeit verfügbar im Verlauf
+
+**Technische Implementierung:** 
+- Seed-Generator: Deterministischer Pseudozufallsgenerator (seeded RNG mit Math.sin-Basis), nicht kryptographisch sicher aber für Lotto-Tipps ausreichend
+- Verlauf: Gespeichert in `localStorage` (max. 50 Einträge, älteste werden automatisch entfernt)
 
 ## Lizenz
 
