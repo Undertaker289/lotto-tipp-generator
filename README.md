@@ -29,7 +29,7 @@ Feste Regeln (Rejection-Sampling, gewichtete Ziehung):
 - Summe der 6 Zahlen ≥ 150 (Ziehungsmittel liegt bei 138, Geburtstagstipps typischerweise bei 100–120)
 - mindestens ein Nachbarpaar (z. B. 43/44) – bewusstes Gegensignal zu "will zufällig aussehen"
 - keine arithmetische 3er-Folge (z. B. 27-34-41)
-- keine der Zahlen 3, 7, 9
+- Zahlen 3, 7, 9 stark benachteiligt (2,5× Popularitätsfaktor), aber nicht kategorisch ausgeschlossen
 - höchstens 3 Primzahlen (reine Primzahlen-Systeme sind selbst ein beliebtes Tippmuster)
 - keine zwei exakt identischen Tipps
 - so viele Tipps wie möglich überschneidungsfrei, danach mit möglichen Überschneidungen (aber weiterhin ohne Duplikate)
@@ -46,11 +46,11 @@ Die Quicktipp-Menge bildet einen Sockel, den keine Zahlenwahl unterschreiten kan
 
 | Tipp-Art | Popularitätsfaktor | erwarteter Topf-Anteil |
 |---|---|---|
-| optimierter Tipp | ~0,15× | ~82–85 % |
+| optimierter Tipp | ~0,2–0,4× | ~80–85 % |
 | Zufallstipp / Quicktipp | 1× | ~67 % |
-| typischer Geburtstagstipp | ~5× | ~30 % |
-| Muster-Tipp (Reihe/Diagonale) | ~100×+ | < 2 % |
-| 1-2-3-4-5-6 | ~2000× | < 0,1 % |
+| typischer Geburtstagstipp | ~4–6× | ~25–35 % |
+| Muster-Tipp (Reihe/Diagonale) | ~80–150×+ | < 3 % |
+| 1-2-3-4-5-6 | ~1500×+ | < 0,2 % |
 
 ## Grenzen der Methode
 
@@ -61,6 +61,8 @@ Die Quicktipp-Menge bildet einen Sockel, den keine Zahlenwahl unterschreiten kan
 ## Technik
 
 Eine einzelne, abhängigkeitsfreie `index.html` (Vanilla JS, kein Build-Prozess). Läuft vollständig im Browser, keine Serverkomponente, keine Datenübertragung.
+
+**Reproduzierbarkeit:** Tipps können mit einem optionalen Seed-Wert reproduziert werden – ideal zum Teilen mit Freunden oder zum Debuggen.
 
 ## Lizenz
 
