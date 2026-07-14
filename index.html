@@ -271,7 +271,14 @@
     countInput.value = count;
 
     const seedInput = document.getElementById('seed');
-    initSeed(seedInput.value);
+    let seedValue = seedInput.value.trim();
+
+    if (!seedValue) {
+      seedValue = Math.floor(Math.random() * 999999999) + 1;
+      seedInput.value = seedValue;
+    }
+
+    initSeed(seedValue);
 
     const excluded = parseExcluded(document.getElementById('exclude').value);
     const warn = document.getElementById('warn');

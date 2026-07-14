@@ -62,7 +62,22 @@ Die Quicktipp-Menge bildet einen Sockel, den keine Zahlenwahl unterschreiten kan
 
 Eine einzelne, abhängigkeitsfreie `index.html` (Vanilla JS, kein Build-Prozess). Läuft vollständig im Browser, keine Serverkomponente, keine Datenübertragung.
 
-**Reproduzierbarkeit:** Tipps können mit einem optionalen Seed-Wert reproduziert werden – ideal zum Teilen mit Freunden oder zum Debuggen.
+### Reproduzierbarkeit mit Seed
+
+Das **Seed-Feld** ermöglicht deterministische Tipp-Generierung: Dieselbe Seed-Zahl erzeugt immer dieselben Tipps.
+
+**Wie es funktioniert:**
+- **Automatisch:** Bei jedem Klick auf "Tipps generieren" wird (falls leer) automatisch ein zufälliger Seed generiert und angezeigt
+- **Manuell:** Du kannst auch selbst eine Seed-Zahl eingeben (z.B. `12345`)
+- **Resultat:** Mehrfaches Klicken mit **gleichem Seed** = **identische Tipps**
+
+**Praktische Anwendungen:**
+- **Tipps speichern:** Der Auto-Seed wird angezeigt → speichern, um später die gleichen Tipps zu reproduzieren
+- **Mit Freunden teilen:** "Nutze Seed `9999`, dann hast du die gleichen Tipps wie ich"
+- **Reproduzieren:** Interessante Kombination? Den angezeigten Seed notieren und später erneut eingeben
+- **Vergleichen:** A/B-Tests: Beide mit Seed X bekommen identische Resultate
+
+**Technische Implementierung:** Verwendet einen deterministischen Pseudozufallsgenerator (seeded RNG mit Math.sin-Basis), nicht kryptographisch sicher aber für Lotto-Tipps ausreichend.
 
 ## Lizenz
 
