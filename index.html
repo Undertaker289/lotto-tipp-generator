@@ -232,13 +232,14 @@
     }
   }
 
-  function saveEntry(seed, tips, popularities) {
+  function saveEntry(seed, tips, popularities, exclude) {
     try {
       let history = loadHistory();
       history.unshift({
         seed: seed,
         tips: tips,
         popularities: popularities,
+        exclude: exclude || '',
         date: new Date().toLocaleString('de-AT')
       });
       if (history.length > MAX_HISTORY) {
@@ -292,6 +293,7 @@
         const entry = history[index];
         document.getElementById('seed').value = entry.seed;
         document.getElementById('count').value = entry.tips.length;
+        document.getElementById('exclude').value = entry.exclude || '';
         generate();
       }
     } catch (e) {
@@ -440,6 +442,11 @@
     goButton.disabled = true;
     goButton.textContent = '⏳ Wird generiert...';
 
+    const warn = document.getElementById('warn');
+    const info = document.getElementById('info');
+    warn.style.display = 'none';
+    info.style.display = 'none';
+
     const countInput = document.getElementById('count');
     let count = parseInt(countInput.value, 10);
     if (!Number.isFinite(count) || count < 1) count = 1;
@@ -465,11 +472,6 @@
       goButton.textContent = 'Tipps generieren';
       return;
     }
-
-    const warn = document.getElementById('warn');
-    warn.style.display = 'none';
-    const info = document.getElementById('info');
-    info.style.display = 'none';
 
     let pool = [];
     for (let n = 1; n <= 45; n++) if (!excluded.has(n)) pool.push(n);
@@ -504,7 +506,7 @@
 
       if (tips.length > 0) {
         const popularities = tips.map(tip => popularityFactor(tip));
-        const saved = saveEntry(seedValue, tips, popularities);
+        const saved = saveEntry(seedValue, tips, popularities, excludeInput);
         if (!saved) {
           showToast('⚠️ Tipps generiert, aber nicht gespeichert (Speicher voll?)');
         } else {
