@@ -513,6 +513,10 @@
     });
   }
 
+  window.clearHistory = clearHistory;
+  window.deleteHistoryEntry = deleteHistoryEntry;
+  window.loadFromHistory = loadFromHistory;
+
   document.getElementById('go').addEventListener('click', generate);
   showHistory();
   generate();
