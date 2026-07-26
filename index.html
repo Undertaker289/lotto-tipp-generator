@@ -143,6 +143,15 @@
   .cell.hit::after { transform: rotate(-45deg); }
   .cell.blocked { background: var(--line); color: #8A96A8; text-decoration: line-through; }
 
+  #history-list { max-height: 280px; overflow-y: auto; padding-right: 4px; }
+  .hist-entry { background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 7px 10px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .hist-main { flex: 1; cursor: pointer; min-width: 0; }
+  .hist-top { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; color: var(--ink-soft); }
+  .hist-top code { background: rgba(20,40,75,0.1); padding: 1px 5px; border-radius: 3px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink); }
+  .hist-tips { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+  .hist-del { background: transparent; color: var(--ink-soft); border: 1px solid var(--line); border-radius: 4px; width: 26px; height: 26px; flex-shrink: 0; cursor: pointer; font-size: 13px; line-height: 1; transition: all 0.15s ease; }
+  .hist-del:hover { background: var(--red); color: #fff; border-color: var(--red); }
+
   .toast {
     position: fixed;
     bottom: 24px;
@@ -302,17 +311,17 @@
 
     historyPanel.style.display = 'block';
 
-    let html = '<div style="display: flex; flex-direction: column; gap: 8px;">';
+    let html = '<div style="display: flex; flex-direction: column; gap: 6px;">';
     history.forEach((entry, idx) => {
-      const tipStr = entry.tips.map(t => `<span class="num" style="background: var(--yellow); padding: 3px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; display: inline-block; min-width: 30px; text-align: center;">${String(t).padStart(2, '0')}</span>`).join('');
+      const tipStr = entry.tips.map(t => t.join(',')).join('  ·  ');
+      const countLabel = entry.tips.length + (entry.tips.length === 1 ? ' Tipp' : ' Tipps');
       html += `
-        <div style="background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
-          <div style="flex: 1; cursor: pointer; min-width: 0;" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();loadFromHistory(${idx})}" onclick="loadFromHistory(${idx})" title="Klicken oder Enter zum Laden">
-            <div style="font-size: 12px; font-weight: 500; color: var(--ink); margin-bottom: 4px;">Seed: <code style="background: rgba(20,40,75,0.1); padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 11px;">${entry.seed}</code></div>
-            <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 4px;">${tipStr}</div>
-            <div style="font-size: 11px; color: var(--ink-soft);">${entry.date}</div>
+        <div class="hist-entry">
+          <div class="hist-main" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();loadFromHistory(${idx})}" onclick="loadFromHistory(${idx})" title="Klicken oder Enter zum Laden">
+            <div class="hist-top"><span>Seed <code>${entry.seed}</code> · ${countLabel}</span><span>${entry.date}</span></div>
+            <div class="hist-tips">${tipStr}</div>
           </div>
-          <button onclick="deleteHistoryEntry(${idx})" style="background: var(--red); color: white; border: none; border-radius: 4px; padding: 6px 10px; cursor: pointer; font-size: 12px; white-space: nowrap;">Löschen</button>
+          <button class="hist-del" onclick="deleteHistoryEntry(${idx})" title="Eintrag löschen" aria-label="Eintrag löschen">✕</button>
         </div>
       `;
     });
