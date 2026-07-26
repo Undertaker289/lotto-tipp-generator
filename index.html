@@ -205,7 +205,7 @@
 <script>
 (function () {
   const PRIMES = new Set([2,3,5,7,11,13,17,19,23,29,31,37,41,43]);
-  const MIN_NUM = 14, MAX_LOW = 2, MIN_SUM = 150, TRIES = 40000;
+  const MAX_LOW = 2, MIN_SUM = 150, TRIES = 40000;
 
   let currentSeed = null;
   let seededRandom = Math.random;
@@ -360,14 +360,13 @@
           if (s[j]-s[i] === s[k]-s[j]) return true;
     return false;
   }
-  function validate(s, maxLow) {
+  function validate(s, opts) {
     const sum = s.reduce((a,b)=>a+b,0);
-    if (sum < MIN_SUM) return false;
-    if (s[0] < MIN_NUM) return false;
-    if (s.filter(n => n <= 31).length > maxLow) return false;
-    if (!hasAdjacentPair(s)) return false;
-    if (hasArithmeticTriple(s)) return false;
-    if (s.filter(n => PRIMES.has(n)).length >= 6) return false;
+    if (sum < opts.minSum) return false;
+    if (s.filter(n => n <= 31).length > opts.maxLow) return false;
+    if (opts.requireAdjacentPair && !hasAdjacentPair(s)) return false;
+    if (opts.excludeArithmeticTriple && hasArithmeticTriple(s)) return false;
+    if (opts.excludeAllPrime && s.filter(n => PRIMES.has(n)).length >= 6) return false;
     return true;
   }
   function popularityFactor(s) {
@@ -391,19 +390,34 @@
   function sameTip(a, b) {
     return a.length === b.length && a.every((n, i) => n === b[i]);
   }
-  function drawTip(pool, existing, maxLow) {
+  const STRICT_OPTS = { maxLow: MAX_LOW, minSum: MIN_SUM, requireAdjacentPair: true, excludeArithmeticTriple: true, excludeAllPrime: true };
+
+  function drawTip(pool, existing, opts) {
+    if (pool.length < 6) return null;
     for (let t = 0; t < TRIES; t++) {
       const pick = shuffle(pool.slice()).slice(0, 6).sort((a,b)=>a-b);
-      if (validate(pick, maxLow) && !existing.some(e => sameTip(e, pick))) return pick;
+      if (validate(pick, opts) && !existing.some(e => sameTip(e, pick))) return pick;
     }
     return null;
   }
-  // Non-overlapping tipps compete for a small pool of "high" numbers (32-45).
-  // Once that pool runs low, keep tipps disjoint by loosening the low/high
-  // ratio step by step instead of immediately allowing overlaps.
+  // As the shrinking pool of unused numbers gets awkward (few adjacent pairs,
+  // no valid arithmetic-free combo left, etc.), progressively drop the softer
+  // anti-popularity constraints instead of giving up on a disjoint tip early.
+  // The final level accepts any 6 remaining numbers, so a disjoint tip is
+  // always returned as long as at least 6 numbers are left in the pool -
+  // this reaches the true maximum of floor(45/6) = 7 non-overlapping tips.
   function drawDisjointTip(pool, existing) {
+    const levels = [];
     for (let maxLow = MAX_LOW; maxLow <= 6; maxLow++) {
-      const tip = drawTip(pool, existing, maxLow);
+      levels.push({ maxLow, minSum: MIN_SUM, requireAdjacentPair: true, excludeArithmeticTriple: true, excludeAllPrime: true });
+    }
+    levels.push({ maxLow: 6, minSum: MIN_SUM, requireAdjacentPair: false, excludeArithmeticTriple: true, excludeAllPrime: true });
+    levels.push({ maxLow: 6, minSum: MIN_SUM, requireAdjacentPair: false, excludeArithmeticTriple: false, excludeAllPrime: true });
+    levels.push({ maxLow: 6, minSum: 100, requireAdjacentPair: false, excludeArithmeticTriple: false, excludeAllPrime: true });
+    levels.push({ maxLow: 6, minSum: 0, requireAdjacentPair: false, excludeArithmeticTriple: false, excludeAllPrime: false });
+
+    for (const opts of levels) {
+      const tip = drawTip(pool, existing, opts);
       if (tip) return tip;
     }
     return null;
@@ -447,19 +461,19 @@
     info.style.display = 'none';
 
     let pool = [];
-    for (let n = MIN_NUM; n <= 45; n++) if (!excluded.has(n)) pool.push(n);
+    for (let n = 1; n <= 45; n++) if (!excluded.has(n)) pool.push(n);
 
     const tips = [];
     let available = pool.slice();
     let fellBack = false;
     let disjointCount = 0;
     for (let i = 0; i < count; i++) {
-      let tip = fellBack ? drawTip(available, tips, MAX_LOW) : drawDisjointTip(available, tips);
+      let tip = fellBack ? drawTip(available, tips, STRICT_OPTS) : drawDisjointTip(available, tips);
       if (!tip && !fellBack) {
         fellBack = true;
         disjointCount = i;
         available = pool.slice();
-        tip = drawTip(available, tips, MAX_LOW);
+        tip = drawTip(available, tips, STRICT_OPTS);
       }
       if (!tip) {
         warn.textContent = '⚠️ Zu viele Zahlen ausgeschlossen – bitte weniger Zahlen eingeben.';
