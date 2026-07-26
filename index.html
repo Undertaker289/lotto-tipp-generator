@@ -187,7 +187,6 @@
         <input type="text" id="exclude" value="" placeholder="optional" spellcheck="false">
       </div>
       <button class="go" id="go">Tipps generieren</button>
-      <button class="go secondary" id="reroll" type="button" title="Neue Zufallstipps mit frischem Seed generieren, ohne den Seed manuell zu leeren">🎲 Neue Tipps</button>
     </div>
     <p class="warn" id="warn"></p>
     <p class="hint" id="info" style="display:none"></p>
@@ -442,7 +441,6 @@
 
     if (!seedValue) {
       seedValue = Math.floor(Math.random() * 999999999) + 1;
-      seedInput.value = seedValue;
     }
 
     initSeed(seedValue);
@@ -545,10 +543,6 @@
   window.loadFromHistory = loadFromHistory;
 
   document.getElementById('go').addEventListener('click', generate);
-  document.getElementById('reroll').addEventListener('click', function () {
-    document.getElementById('seed').value = '';
-    generate();
-  });
   showHistory();
   generate();
 })();

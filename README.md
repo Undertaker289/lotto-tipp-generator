@@ -67,9 +67,9 @@ Eine einzelne, abhängigkeitsfreie `index.html` (Vanilla JS, kein Build-Prozess)
 Das **Seed-Feld** ermöglicht deterministische Tipp-Generierung: Dieselbe Seed-Zahl erzeugt immer dieselben Tipps.
 
 **Wie es funktioniert:**
-- **Automatisch:** Bei jedem Klick auf "Tipps generieren" wird (falls leer) automatisch ein zufälliger Seed generiert und angezeigt
-- **Manuell:** Du kannst auch selbst eine Seed-Zahl eingeben (z.B. `12345`)
-- **Resultat:** Mehrfaches Klicken mit **gleichem Seed** = **identische Tipps**
+- **Leeres Feld:** Bei jedem Klick auf "Tipps generieren" wird ein neuer zufälliger Seed verwendet (aber nicht ins Feld eingetragen) – so liefert jeder Klick frische Tipps
+- **Manuell:** Du kannst selbst eine Seed-Zahl eingeben (z.B. `12345`), um sie zu fixieren
+- **Resultat:** Mehrfaches Klicken mit **gleichem, manuell eingetragenem Seed** = **identische Tipps**
 
 **Verlauf:**
 - Jede Generierung wird automatisch mit Seed, Tipps und Datum gespeichert (bis zu 50 Einträge)
