@@ -67,6 +67,15 @@
   }
   select:focus, input[type=text]:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(20,40,75,0.12); }
   input[type=text] { width: 260px; max-width: 100%; }
+  .seed-wrap { position: relative; display: inline-block; }
+  .seed-wrap input { padding-right: 26px; }
+  #seed-clear {
+    position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+    background: transparent; border: none; color: var(--ink-soft);
+    cursor: pointer; font-size: 13px; line-height: 1; padding: 4px;
+    border-radius: 4px; transition: all 0.15s ease;
+  }
+  #seed-clear:hover { background: var(--line); color: var(--ink); }
   .check { display: flex; align-items: center; gap: 8px; font-size: 14px; padding-bottom: 9px; cursor: pointer; }
   .check input { width: 17px; height: 17px; accent-color: var(--ink); cursor: pointer; }
   button.go {
@@ -189,7 +198,10 @@
       </div>
       <div class="field">
         <label for="seed" title="Gleiches Seed = gleiche Tipps jedes Mal. Leerfeld = automatisch generiert.">Seed (optional) <span style="color: var(--ink-soft); cursor: help;">❓</span></label>
-        <input type="text" id="seed" value="" placeholder="für Reproduzierbarkeit" spellcheck="false" style="width:140px">
+        <div class="seed-wrap">
+          <input type="text" id="seed" value="" placeholder="für Reproduzierbarkeit" spellcheck="false" style="width:140px">
+          <button type="button" id="seed-clear" title="Seed leeren &amp; neu zuf&auml;llig generieren" aria-label="Seed leeren und neu zuf&auml;llig generieren" style="display:none">✕</button>
+        </div>
       </div>
       <div class="field">
         <label for="exclude">Zahlen ausschlie&szlig;en</label>
@@ -294,6 +306,7 @@
         document.getElementById('seed').value = entry.seed;
         document.getElementById('count').value = entry.tips.length;
         document.getElementById('exclude').value = entry.exclude || '';
+        updateSeedClearButton();
         generate();
       }
     } catch (e) {
@@ -575,11 +588,23 @@
   window.deleteHistoryEntry = deleteHistoryEntry;
   window.loadFromHistory = loadFromHistory;
 
+  function updateSeedClearButton() {
+    document.getElementById('seed-clear').style.display = document.getElementById('seed').value ? 'block' : 'none';
+  }
+
   document.getElementById('go').addEventListener('click', generate);
   ['count', 'seed', 'exclude'].forEach(function (id) {
     document.getElementById(id).addEventListener('keydown', function (e) {
       if (e.key === 'Enter') generate();
     });
+  });
+  document.getElementById('seed').addEventListener('input', updateSeedClearButton);
+  document.getElementById('seed-clear').addEventListener('click', function () {
+    const seedInput = document.getElementById('seed');
+    seedInput.value = '';
+    updateSeedClearButton();
+    seedInput.focus();
+    generate();
   });
   showHistory();
   generate();
