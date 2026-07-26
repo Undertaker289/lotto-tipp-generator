@@ -338,12 +338,17 @@
       seededRandom = Math.random;
       return;
     }
-    currentSeed = Math.abs(parseInt(seed, 10)) || null;
-    if (!currentSeed) {
+    const parsed = parseInt(seed, 10);
+    if (!Number.isFinite(parsed)) {
+      currentSeed = null;
       seededRandom = Math.random;
       return;
     }
-    let x = Math.sin(currentSeed) * 10000;
+    currentSeed = Math.abs(parsed);
+    // sin(0) is exactly 0, which would make the generator return 0 forever
+    // (a fixed point) and freeze every shuffle into the same permutation -
+    // fall back to 1 only for the internal hash, seed 0 stays seed 0.
+    let x = Math.sin(currentSeed || 1) * 10000;
     x = x - Math.floor(x);
     seededRandom = (function(s) {
       return function() {
@@ -439,6 +444,7 @@
 
   function generate() {
     const goButton = document.getElementById('go');
+    if (goButton.disabled) return;
     goButton.disabled = true;
     goButton.textContent = '⏳ Wird generiert...';
     // Defer the heavy work a tick so the browser can actually paint the
@@ -462,6 +468,14 @@
 
     const seedInput = document.getElementById('seed');
     let seedValue = seedInput.value.trim();
+
+    if (seedValue && !/^-?\d+$/.test(seedValue)) {
+      warn.textContent = '⚠️ Seed muss eine ganze Zahl sein (z.B. 12345).';
+      warn.style.display = 'block';
+      goButton.disabled = false;
+      goButton.textContent = 'Tipps generieren';
+      return;
+    }
 
     if (!seedValue) {
       seedValue = Math.floor(Math.random() * 999999999) + 1;
