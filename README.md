@@ -22,35 +22,35 @@ Realbeispiel: Am 10. April 1999 wurden in Deutschland 2-3-4-5-6-26 gezogen. Rund
 
 ## Wie der Generator das umsetzt
 
-Feste Regeln (Rejection-Sampling, gewichtete Ziehung):
+Feste Regeln (reines Rejection-Sampling – die Ziehung selbst ist uniform, nicht gewichtet):
 
-- keine Zahl unter 14
-- höchstens 2 Zahlen im Geburtstagsbereich (≤ 31) – wird beim überschneidungsfreien Ziehen schrittweise gelockert (3, 4, …), falls der Pool an Zahlen > 31 sonst zu früh aufgebraucht wäre, damit mehr Tipps ohne Überschneidungen möglich bleiben
+- höchstens 2 Zahlen im Geburtstagsbereich (≤ 31) – wird beim überschneidungsfreien Ziehen schrittweise gelockert (3, 4, … bis 6), falls der Pool an Zahlen > 31 sonst zu früh aufgebraucht wäre, damit mehr Tipps ohne Überschneidungen möglich bleiben
 - Summe der 6 Zahlen ≥ 150 (Ziehungsmittel liegt bei 138, Geburtstagstipps typischerweise bei 100–120)
 - mindestens ein Nachbarpaar (z. B. 43/44) – bewusstes Gegensignal zu "will zufällig aussehen"
 - keine arithmetische 3er-Folge (z. B. 27-34-41)
-- Zahlen 3, 7, 9 stark benachteiligt (2,5× Popularitätsfaktor), aber nicht kategorisch ausgeschlossen
-- höchstens 3 Primzahlen (reine Primzahlen-Systeme sind selbst ein beliebtes Tippmuster)
+- keine reinen Primzahlen-Tipps (Ausschluss nur, wenn alle 6 Zahlen Primzahlen sind – bis zu 5 Primzahlen sind weiterhin erlaubt; reine Primzahlen-Systeme sind selbst ein beliebtes Tippmuster)
 - keine zwei exakt identischen Tipps
 - so viele Tipps wie möglich überschneidungsfrei, danach mit möglichen Überschneidungen (aber weiterhin ohne Duplikate)
 
+Die Zahlen 3, 7 und 9 werden dabei **nicht** ausgeschlossen oder bei der Ziehung benachteiligt – sie fließen nur in die rein informative Popularitätsschätzung unten ein (2,5× Faktor pro Zahl).
+
 ## "Popularität" und "erwarteter Topf-Anteil" im Interface
 
-**Popularität** (z. B. "1,8× Durchschnitt") schätzt, wie oft andere Spieler genau diese 6 Zahlen wählen würden, verglichen mit einem reinen Zufallstipp. 1,0× = durchschnittlich. Das ist eine Schätzung auf Basis bekannter Tippmuster (siehe oben), **keine gemessene Verkaufszahl** – die Richtung ist verlässlicher als die exakte Zahl.
+**Popularität** (z. B. "1,8× Durchschnitt") schätzt, wie oft andere Spieler genau diese 6 Zahlen wählen würden, verglichen mit einem reinen Zufallstipp. Das ist eine Schätzung auf Basis bekannter Tippmuster (siehe oben), **keine gemessene Verkaufszahl** – die Richtung ist verlässlicher als die exakte Zahl. "1,0× = durchschnittlich" im Interface ist als grober Orientierungspunkt gedacht, nicht als kalibrierter Mittelwert: In der aktuellen Formel bekommen Zahlen > 31 keinen Malus, aber auch keinen Bonus, wodurch ein tatsächlich uniform zufällig gezogener Tipp im Schnitt eher bei 6–7× landet statt bei 1×. Die relative Aussage – niedrige/beliebte Zahlen erhöhen den Faktor, hohe/unauffällige senken ihn – stimmt trotzdem.
 
 **Erwarteter Topf-Anteil** ist die eigentlich relevante Größe: Falls der Tipp den Sechser trifft, welchen Anteil am Gewinntopf bekommst du im Schnitt, nachdem er mit eventuellen Mitgewinnern geteilt wurde?
 
 Modell dahinter: ~7 Mio abgegebene Tipps pro Runde, davon geschätzt ~35 % reine Quicktipps (gleichmäßig über alle Kombinationen verteilt). Die Anzahl der Mitgewinner wird als Poisson-verteilt angenommen mit λ = N·p; der erwartete Anteil ergibt sich aus (1 − e⁻λ) / λ.
 
-Die Quicktipp-Menge bildet einen Sockel, den keine Zahlenwahl unterschreiten kann – selbst der bestmögliche Tipp landet realistisch nie über ~85 % erwartetem Anteil. Größenordnungen im Modell:
+Die Quicktipp-Menge bildet einen Sockel, den keine Zahlenwahl unterschreiten kann – selbst der bestmögliche vom Generator erzeugte Tipp landet realistisch nie über ~73 % erwartetem Anteil. Der Popularitätsfaktor ist im Code außerdem hart auf maximal 50× gedeckelt (`Math.min(50, …)`), auch wenn die rohe, ungedeckelte Rechnung für extreme Muster weit darüber liegen würde. Tatsächlich simulierte Größenordnungen (Median über mehrere tausend Stichproben je Kategorie):
 
-| Tipp-Art | Popularitätsfaktor | erwarteter Topf-Anteil |
+| Tipp-Art | Popularitätsfaktor (typisch) | erwarteter Topf-Anteil |
 |---|---|---|
-| optimierter Tipp | ~0,2–0,4× | ~80–85 % |
-| Zufallstipp / Quicktipp | 1× | ~67 % |
-| typischer Geburtstagstipp | ~4–6× | ~25–35 % |
-| Muster-Tipp (Reihe/Diagonale) | ~80–150×+ | < 3 % |
-| 1-2-3-4-5-6 | ~1500×+ | < 0,2 % |
+| optimierter Tipp (Generator-Output) | ~0,7–3× (Median ~1,3×) | ~50–73 % |
+| Zufallstipp / Quicktipp (uniform aus 45) | ~2–27× (Median ~6×) | ~5–50 % |
+| typischer Geburtstagstipp (6 Zahlen aus 1–31) | ~7–50×, oft am Deckel | ~3–24 % |
+| Muster-Tipp (Reihe/Diagonale/Vielfache) | ~5–18× | ~10–33 % |
+| 1-2-3-4-5-6 | 50× (Deckel; ungedeckelt ≈ 85×) | ~3,5 % |
 
 ## Grenzen der Methode
 
@@ -60,7 +60,7 @@ Die Quicktipp-Menge bildet einen Sockel, den keine Zahlenwahl unterschreiten kan
 
 ## Technik
 
-Eine einzelne, abhängigkeitsfreie `index.html` (Vanilla JS, kein Build-Prozess). Läuft vollständig im Browser, keine Serverkomponente, keine Datenübertragung.
+Eine einzelne, abhängigkeitsfreie `index.html` (Vanilla JS, kein Build-Prozess). Läuft vollständig im Browser, keine Serverkomponente, kein Tracking, keine eigene Datenerfassung. Einzige externe Anfrage ist der Google-Fonts-Ladevorgang (`fonts.googleapis.com`) für die Schriftarten.
 
 ### Reproduzierbarkeit mit Seed & Verlauf
 
