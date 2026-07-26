@@ -441,7 +441,14 @@
     const goButton = document.getElementById('go');
     goButton.disabled = true;
     goButton.textContent = '⏳ Wird generiert...';
+    // Defer the heavy work a tick so the browser can actually paint the
+    // disabled/loading button state first - generate() itself blocks the
+    // main thread for a while at high tip counts.
+    setTimeout(runGeneration, 0);
+  }
 
+  function runGeneration() {
+    const goButton = document.getElementById('go');
     const warn = document.getElementById('warn');
     const info = document.getElementById('info');
     warn.style.display = 'none';
@@ -555,6 +562,11 @@
   window.loadFromHistory = loadFromHistory;
 
   document.getElementById('go').addEventListener('click', generate);
+  ['count', 'seed', 'exclude'].forEach(function (id) {
+    document.getElementById(id).addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') generate();
+    });
+  });
   showHistory();
   generate();
 })();
