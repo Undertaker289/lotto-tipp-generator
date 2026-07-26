@@ -360,11 +360,11 @@
           if (s[j]-s[i] === s[k]-s[j]) return true;
     return false;
   }
-  function validate(s) {
+  function validate(s, maxLow) {
     const sum = s.reduce((a,b)=>a+b,0);
     if (sum < MIN_SUM) return false;
     if (s[0] < MIN_NUM) return false;
-    if (s.filter(n => n <= 31).length > MAX_LOW) return false;
+    if (s.filter(n => n <= 31).length > maxLow) return false;
     if (!hasAdjacentPair(s)) return false;
     if (hasArithmeticTriple(s)) return false;
     if (s.filter(n => PRIMES.has(n)).length >= 6) return false;
@@ -391,10 +391,20 @@
   function sameTip(a, b) {
     return a.length === b.length && a.every((n, i) => n === b[i]);
   }
-  function drawTip(pool, existing) {
+  function drawTip(pool, existing, maxLow) {
     for (let t = 0; t < TRIES; t++) {
       const pick = shuffle(pool.slice()).slice(0, 6).sort((a,b)=>a-b);
-      if (validate(pick) && !existing.some(e => sameTip(e, pick))) return pick;
+      if (validate(pick, maxLow) && !existing.some(e => sameTip(e, pick))) return pick;
+    }
+    return null;
+  }
+  // Non-overlapping tipps compete for a small pool of "high" numbers (32-45).
+  // Once that pool runs low, keep tipps disjoint by loosening the low/high
+  // ratio step by step instead of immediately allowing overlaps.
+  function drawDisjointTip(pool, existing) {
+    for (let maxLow = MAX_LOW; maxLow <= 6; maxLow++) {
+      const tip = drawTip(pool, existing, maxLow);
+      if (tip) return tip;
     }
     return null;
   }
@@ -444,12 +454,12 @@
     let fellBack = false;
     let disjointCount = 0;
     for (let i = 0; i < count; i++) {
-      let tip = drawTip(available, tips);
+      let tip = fellBack ? drawTip(available, tips, MAX_LOW) : drawDisjointTip(available, tips);
       if (!tip && !fellBack) {
         fellBack = true;
         disjointCount = i;
         available = pool.slice();
-        tip = drawTip(available, tips);
+        tip = drawTip(available, tips, MAX_LOW);
       }
       if (!tip) {
         warn.textContent = '⚠️ Zu viele Zahlen ausgeschlossen – bitte weniger Zahlen eingeben.';
