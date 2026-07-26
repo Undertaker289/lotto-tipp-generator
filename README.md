@@ -13,7 +13,7 @@ Nichts hier verändert deine **Gewinnwahrscheinlichkeit**. Jede der 8.145.060 m�
 Menschen tippen nicht zufällig. Dokumentierte Muster:
 
 - **Geburtstage:** Zahlen 1–31 sind massiv übergewichtet, 1–12 doppelt (Tag *und* Monat als möglicher Treffer).
-- **Glückszahlen:** 7 mit Abstand am beliebtesten, dann 3 und 9 (von den Österreichischen Lotterien selbst bestätigt).
+- **Glückszahlen:** 7 mit Abstand am beliebtesten, dann 3 und 9 – alle über 440.000× getippt ([win2day/Österreichische Lotterien](https://www.win2day.at/blog/lotterien-news/lotterien-wissen/meistgetippte-lottozahlen)).
 - **Geometrische Muster** auf dem Tippschein: Reihen, Spalten, Diagonalen. Der gefährlichste Faktor – am 14. Jänner 1995 teilten sich in Großbritannien **133 Gewinner** einen Jackpot, weil die gezogenen Zahlen zufällig einem beliebten Schein-Muster entsprachen.
 - **Arithmetische Folgen** (1-2-3-4-5-6, Vielfache von 5 oder 7): historisch die meistgespielten Kombinationen überhaupt.
 - **Ironie der "klugen" Wahl:** Wer bewusst "zufällig aussehende" Zahlen sucht, meidet unbewusst Nachbarzahlen – dabei enthalten **~53 % aller echten Ziehungen mindestens ein Nachbarpaar**.
