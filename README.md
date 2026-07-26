@@ -25,7 +25,7 @@ Realbeispiel: Am 10. April 1999 wurden in Deutschland 2-3-4-5-6-26 gezogen. Rund
 Feste Regeln (Rejection-Sampling, gewichtete Ziehung):
 
 - keine Zahl unter 14
-- höchstens 2 Zahlen im Geburtstagsbereich (≤ 31)
+- höchstens 2 Zahlen im Geburtstagsbereich (≤ 31) – wird beim überschneidungsfreien Ziehen schrittweise gelockert (3, 4, …), falls der Pool an Zahlen > 31 sonst zu früh aufgebraucht wäre, damit mehr Tipps ohne Überschneidungen möglich bleiben
 - Summe der 6 Zahlen ≥ 150 (Ziehungsmittel liegt bei 138, Geburtstagstipps typischerweise bei 100–120)
 - mindestens ein Nachbarpaar (z. B. 43/44) – bewusstes Gegensignal zu "will zufällig aussehen"
 - keine arithmetische 3er-Folge (z. B. 27-34-41)
