@@ -291,6 +291,7 @@
       if (history[index]) {
         const entry = history[index];
         document.getElementById('seed').value = entry.seed;
+        document.getElementById('count').value = entry.tips.length;
         generate();
       }
     } catch (e) {
