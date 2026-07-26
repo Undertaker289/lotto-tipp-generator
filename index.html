@@ -303,11 +303,16 @@
       const history = loadHistory();
       if (history[index]) {
         const entry = history[index];
-        document.getElementById('seed').value = entry.seed;
+        // Just redisplay the tips already stored for this entry - re-running
+        // generate() would both be redundant (same seed -> same tips) and
+        // add a duplicate copy of this exact entry back onto the history.
         document.getElementById('count').value = entry.tips.length;
         document.getElementById('exclude').value = entry.exclude || '';
+        document.getElementById('seed').value = '';
         updateSeedClearButton();
-        generate();
+        document.getElementById('warn').style.display = 'none';
+        document.getElementById('info').style.display = 'none';
+        render(entry.tips, parseExcluded(entry.exclude || ''));
       }
     } catch (e) {
       console.warn('Eintrag konnte nicht geladen werden:', e);
