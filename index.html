@@ -85,6 +85,8 @@
   button.go:hover { background: #1E3A6B; }
   button.go:active { transform: scale(0.97); }
   button.go:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+  button.go.secondary { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  button.go.secondary:hover { background: var(--paper); }
   .hint { font-size: 12.5px; color: var(--ink-soft); margin-top: 14px; }
   .warn { font-size: 13px; color: var(--red); margin-top: 10px; display: none; }
 
@@ -185,6 +187,7 @@
         <input type="text" id="exclude" value="" placeholder="optional" spellcheck="false">
       </div>
       <button class="go" id="go">Tipps generieren</button>
+      <button class="go secondary" id="reroll" type="button" title="Neue Zufallstipps mit frischem Seed generieren, ohne den Seed manuell zu leeren">🎲 Neue Tipps</button>
     </div>
     <p class="warn" id="warn"></p>
     <p class="hint" id="info" style="display:none"></p>
@@ -542,6 +545,10 @@
   window.loadFromHistory = loadFromHistory;
 
   document.getElementById('go').addEventListener('click', generate);
+  document.getElementById('reroll').addEventListener('click', function () {
+    document.getElementById('seed').value = '';
+    generate();
+  });
   showHistory();
   generate();
 })();
